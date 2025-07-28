@@ -8,7 +8,7 @@ const server = jsonServer.create()
 const router = jsonServer.router('db.json')
 
 // Check if db.json exists, if not create it
-const dbPath = path.join(__dirname, 'db.json')
+const dbPath = path.join(__dirname, '../db.json')
 if (!fs.existsSync(dbPath)) {
   fs.writeFileSync(dbPath, JSON.stringify({}))
 }
@@ -24,8 +24,8 @@ server.use(jsonServer.rewriter({
   '/api/*': '/$1',
   '/api': '/'
 }))
-
-server.use(router)
+server.use(jsonServer.bodyParser);
+server.use('/api', router);
 server.listen(3000, () => {
   console.log('JSON Server is running on http://localhost:3000')
 })
