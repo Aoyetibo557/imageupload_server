@@ -1,79 +1,91 @@
-const jsonServer = require('json-server')
-const fs = require('fs')
-const path = require('path')
+const express = require('express');
+const cors = require('cors');
+const { db } = require('./db');
 
-// Create a JSON Server instance
-const server = jsonServer.create()
+// Import routes
+const imagesRoutes = require("./routers/images.routes");
 
-// Define the database path (use local db.json in api folder)
-const dbPath = path.join(__dirname, 'db.json')
+// Create Express app
+const app = express();
 
-// Check if db.json exists, if not create it with empty structure
-if (!fs.existsSync(dbPath)) {
-  fs.writeFileSync(dbPath, JSON.stringify({
-    images: [],
-  }, null, 2))
-}
+// Middleware
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-// Create router with the local db.json
-const router = jsonServer.router(dbPath)
+app.use(express.json({ limit: '50mb' })); // Increase limit for base64 images
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Use the default middlewares (logger, static, cors and no-cache)
-const middlewares = jsonServer.defaults()
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+  next();
+});
 
-server.use(middlewares)
+// Default Home page route from the index.html file in the public folder
+app.get('/', (req, res) => {
+  res.sendFile('index.html', { root: './public' });
+});
 
-// Add custom middleware for additional CORS if needed
-server.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
-  res.header('Access-Control-Allow-Headers', '*')
-  next()
-})
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 
-// URL rewriting
-// server.use(jsonServer.rewriter({
-//   '/api/*': '/$1'
-// }))
-
-// Body parser middleware
-server.use(jsonServer.bodyParser)
-
-// Custom endpoints/middleware (add before router)
-// Example: Add timestamp to new images
-server.use((req, res, next) => {
-  if (req.method === 'POST' && req.path === '/images') {
-    req.body.uploadedAt = new Date().toISOString()
-    req.body.id = Date.now() // Simple ID generation
+// Stats endpoint
+app.get('/images/stats', (req, res) => {
+  try {
+    const images = db.get('images').value() || [];
+    
+    res.json({
+      total: images.length,
+      totalSize: images.reduce((sum, img) => sum + (img.size || 0), 0),
+      types: [...new Set(images.map(img => img.type).filter(Boolean))]
+    });
+  } catch (error) {
+    console.error('Error getting stats:', error);
+    res.status(500).json({ error: 'Failed to get stats' });
   }
-  next()
-})
+});
 
-// Custom endpoint example
+// Use routes
+app.use('/images', imagesRoutes);
 
-// Get all images
-server.get('/images', (req, res) => {
-  const db = router.db // Get database
-  const images = db.get('images').value()
-  res.json(images)
-})
-
-server.get('/images/stats', (req, res) => {
-  const db = router.db // Get database
-  const images = db.get('images').value()
+// 404 handler
+app.use('*', (req, res) => {
+  // Check if request expects JSON (API call)
+  if (req.accepts('json') && !req.accepts('html')) {
+    return res.status(404).json({ 
+      error: 'Route not found',
+      path: req.originalUrl,
+      method: req.method
+    });
+  }
   
-  res.json({
-    total: images.length,
-    totalSize: images.reduce((sum, img) => sum + (img.size || 0), 0),
-    types: [...new Set(images.map(img => img.type))]
-  })
-})
+  // Browser request - redirect to homepage
+  res.redirect('/');
+});
 
-// Use router with /api prefix
-server.use('/api', router)
+// Error handler
+app.use((error, req, res, next) => {
+  console.error('Server Error:', error);
+  res.status(500).json({ 
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+  });
+});
 
 // Start server
-const PORT = process.env.PORT || 4040
-server.listen(PORT, () => {
-  console.log(`JSON Server is running on http://localhost:${PORT}`)
-  console.log(`API endpoints available at http://localhost:${PORT}/api`)
-})
+const PORT = process.env.PORT || 4040;
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`📷 Images API: http://localhost:${PORT}/images`);
+  console.log(`📊 Stats API: http://localhost:${PORT}/images/stats`);
+  console.log(`❤️  Health Check: http://localhost:${PORT}/health`);
+});

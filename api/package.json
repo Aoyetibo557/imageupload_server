@@ -1,13 +1,26 @@
 {
-    "name": "json-server-vercel",
+    "name": "images-api",
     "version": "1.0.0",
-    "description": "Deploy JSON Server to Vercel",
+    "description": "Images API with Express and LowDB",
     "main": "server.js",
     "scripts": {
         "start": "node server.js",
-        "dev": "json-server --watch db.json --port 3000"
+        "dev": "nodemon server.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
-        "json-server": "^0.17.4"
-    }
+        "express": "^4.18.2",
+        "cors": "^2.8.5",
+        "lowdb": "^1.0.0",
+        "uuid": "^9.0.0"
+    },
+    "devDependencies": {
+        "nodemon": "^3.0.1"
+    },
+    "engines": {
+        "node": "18.x"
+    },
+    "keywords": ["express", "api", "images", "lowdb"],
+    "author": "",
+    "license": "ISC"
 }

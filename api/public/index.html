@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JSON Server API - Images Endpoint</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>Images API</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,471 +15,448 @@
             box-sizing: border-box;
         }
         
-         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --secondary: #6b7280;
-            --accent: #10b981;
-            --dark: #111827;
-            --dark-light: #1f2937;
-            --dark-card: #374151;
-            --gray: #9ca3af;
-            --gray-light: #d1d5db;
-            --light: #f9fafb;
-            --white: #ffffff;
-            --gradient: linear-gradient(135deg, var(--dark) 0%, var(--dark-light) 100%);
-            --glass: rgba(55, 65, 81, 0.4);
-            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            --border: rgba(156, 163, 175, 0.2);
-        }
-        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Poppins', sans-serif;
+            background: #000;
+            color: #fff;
             line-height: 1.6;
-            color: var(--white);
-            background: var(--dark);
-            overflow-x: hidden;
-        }
-        
-        .background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark);
-            z-index: -2;
+            min-height: 100vh;
         }
         
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 2rem;
+            padding: 40px 20px;
         }
         
         header {
-            padding: 2rem 0;
             text-align: center;
-            position: relative;
+            margin-bottom: 60px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 40px;
         }
         
         .logo {
-            font-size: 2.5rem;
+            font-size: 3rem;
             font-weight: 700;
-            color: var(--white);
-            margin-bottom: 0.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff, #999);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .subtitle {
-            font-size: 1.125rem;
-            color: var(--gray);
-            margin-bottom: 2rem;
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: #999;
         }
         
-        .hero-card {
-            background: var(--dark-light);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 2rem;
-            margin: 1.5rem 0;
-            box-shadow: var(--shadow);
-            transition: all 0.2s ease;
-        }
-        
-        .hero-card:hover {
-            border-color: var(--primary);
-        }
-        
-        .endpoint-section {
+        .status-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
+            gap: 30px;
+            margin-bottom: 60px;
         }
         
-        .endpoint-card {
-            background: var(--dark-light);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.5rem;
-            transition: all 0.2s ease;
-            position: relative;
+        .status-card {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
         }
         
-        .endpoint-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        .status-card:hover {
+            border-color: #555;
+            transform: translateY(-5px);
         }
         
-        .endpoint-icon {
-            font-size: 2rem;
-            color: var(--accent);
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .endpoint-title {
+        .status-card h3 {
             font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        
-        .code-block {
-            background: var(--dark);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 1rem;
-            margin: 1rem 0;
-            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-            font-size: 0.875rem;
-            position: relative;
-            overflow-x: auto;
-        }
-        
-        .code-block::before {
-            content: 'JSON';
-            position: absolute;
-            top: 0.5rem;
-            right: 0.75rem;
-            background: var(--secondary);
-            color: white;
-            padding: 0.125rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.625rem;
-            font-weight: 500;
-        }
-        
-        .method {
-            color: var(--accent);
-            font-weight: 600;
-        }
-        
-        .url {
-            color: var(--primary);
-        }
-        
-        .try-button {
-            background: var(--primary);
-            border: none;
-            border-radius: 6px;
-            padding: 0.75rem 1.5rem;
-            color: white;
-            font-weight: 500;
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            margin: 1rem auto;
-            display: block;
-        }
-        
-        .try-button:hover {
-            background: var(--primary-dark);
-        }
-        
-        .try-button:active {
-            transform: translateY(1px);
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin: 3rem 0;
-        }
-        
-        .feature {
-            text-align: center;
-            padding: 1.5rem;
-        }
-        
-        .feature-icon {
-            font-size: 1.5rem;
-            color: var(--accent);
-            margin-bottom: 0.75rem;
-        }
-        
-        .feature h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        .feature p {
-            color: var(--gray);
-            font-size: 0.875rem;
-        }
-        
-        footer {
-            text-align: center;
-            padding: 2rem 0;
-            margin-top: 3rem;
-            border-top: 1px solid var(--border);
-        }
-        
-        .footer-links {
+            margin-bottom: 20px;
+            color: #fff;
             display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .footer-links a {
-            color: var(--gray);
-            text-decoration: none;
-            transition: color 0.2s ease;
-        }
-        
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-        
-        .response-display {
-            background: var(--dark);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 1rem;
-            margin-top: 1rem;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
-            font-size: 0.8rem;
-            line-height: 1.4;
-            display: none;
+            align-items: center;
+            gap: 10px;
         }
         
         .status-indicator {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.75rem;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-indicator.loading {
+            background: #ffaa00;
+        }
+        
+        .status-indicator.error {
+            background: #ff0000;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        
+        .stat-item {
+            margin: 10px 0;
+            font-size: 1rem;
+            color: #ccc;
+        }
+        
+        .stat-value {
+            color: #fff;
+            font-weight: 600;
+        }
+        
+        .endpoints-section {
+            margin-top: 60px;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .endpoints-grid {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .endpoint {
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .endpoint:hover {
+            border-color: #555;
+            background: #161616;
+        }
+        
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .method {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .method.get {
+            background: #4CAF50;
+            color: #000;
+        }
+        
+        .method.post {
+            background: #2196F3;
+            color: #fff;
+        }
+        
+        .method.patch {
+            background: #FF9800;
+            color: #000;
+        }
+        
+        .method.delete {
+            background: #F44336;
+            color: #fff;
+        }
+        
+        .endpoint-path {
+            font-size: 1.1rem;
             font-weight: 500;
-            margin-bottom: 0.75rem;
+            color: #fff;
+            font-family: 'Courier New', monospace;
         }
         
-        .status-success {
-            background: rgba(34, 197, 94, 0.2);
-            color: #22c55e;
-            border: 1px solid rgba(34, 197, 94, 0.3);
+        .endpoint-desc {
+            color: #999;
+            margin-bottom: 10px;
         }
         
-        .status-error {
-            background: rgba(239, 68, 68, 0.2);
-            color: #ef4444;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        .endpoint-example {
+            background: #000;
+            border: 1px solid #333;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: #00ff00;
+            overflow-x: auto;
+        }
+        
+        .footer {
+            margin-top: 80px;
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid #333;
+            color: #666;
+        }
+        
+        .refresh-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            background: #ddd;
+            transform: scale(1.05);
+        }
+        
+        .loading {
+            color: #999;
+            font-style: italic;
         }
         
         @media (max-width: 768px) {
             .container {
-                padding: 0 1rem;
+                padding: 20px 15px;
             }
             .logo {
                 font-size: 2rem;
             }
-            .hero-card {
-                padding: 2rem;
-            }
-            .endpoint-section {
+            .status-grid {
                 grid-template-columns: 1fr;
             }
-            .features {
-                grid-template-columns: 1fr;
-            }
-            .footer-links {
+            .endpoint-header {
                 flex-direction: column;
-                gap: 1rem;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .hero-card {
-                padding: 1.5rem;
-            }
-            .code-block {
-                padding: 1rem;
-                font-size: 0.8rem;
+                align-items: flex-start;
+                gap: 10px;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="background"></div>
-
     <div class="container">
         <header>
-            <h1 class="logo">JSON Server API</h1>
-            <p class="subtitle">Powerful REST API deployed on Vercel</p>
+            <h1 class="logo">Images API</h1>
+            <p class="subtitle">RESTful API for image management</p>
         </header>
 
-        <div class="hero-card">
-            <h2 style="font-size: 2rem; margin-bottom: 1rem; text-align: center;">
-                <i class="fas fa-rocket" style="color: var(--secondary); margin-right: 0.5rem;"></i> Ready to Serve Your Data
-            </h2>
-            <p style="text-align: center; font-size: 1rem; color: var(--gray); margin-bottom: 1.5rem;">
-                A clean, fast JSON Server instance with full REST API capabilities.
-            </p>
+        <div class="status-grid">
+            <div class="status-card">
+                <h3>
+                    <span class="status-indicator" id="health-indicator"></span> Server Status
+                </h3>
+                <div class="stat-item">Status: <span class="stat-value" id="health-status">Checking...</span></div>
+                <div class="stat-item">Uptime: <span class="stat-value" id="uptime">-</span></div>
+                <div class="stat-item">Last Check: <span class="stat-value" id="last-check">-</span></div>
+                <button class="refresh-btn" onclick="checkHealth()">Refresh</button>
+            </div>
 
-            <div class="features">
-                <div class="feature">
-                    <div class="feature-icon"><i class="fas fa-zap"></i></div>
-                    <h3>Lightning Fast</h3>
-                    <p>Optimized for speed and performance</p>
+            <div class="status-card">
+                <h3>
+                    <span class="status-indicator" id="db-indicator"></span> Database Stats
+                </h3>
+                <div class="stat-item">Total Images: <span class="stat-value" id="total-images">-</span></div>
+                <div class="stat-item">Total Size: <span class="stat-value" id="total-size">-</span></div>
+                <div class="stat-item">Image Types: <span class="stat-value" id="image-types">-</span></div>
+                <button class="refresh-btn" onclick="getStats()">Refresh</button>
+            </div>
+        </div>
+
+        <div class="endpoints-section">
+            <h2 class="section-title">API Endpoints</h2>
+
+            <div class="endpoints-grid">
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/images</span>
+                    </div>
+                    <div class="endpoint-desc">Get all images or search with query parameter</div>
+                    <div class="endpoint-example">GET /images?name_like=sunset</div>
                 </div>
-                <div class="feature">
-                    <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
-                    <h3>Reliable</h3>
-                    <p>Built on Vercel's robust infrastructure</p>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/images/:id</span>
+                    </div>
+                    <div class="endpoint-desc">Get a specific image by ID</div>
+                    <div class="endpoint-example">GET /images/123e4567-e89b-12d3-a456-426614174000</div>
                 </div>
-                <div class="feature">
-                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
-                    <h3>Responsive</h3>
-                    <p>Perfect for web and mobile applications</p>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method post">POST</span>
+                        <span class="endpoint-path">/images</span>
+                    </div>
+                    <div class="endpoint-desc">Create a new image</div>
+                    <div class="endpoint-example">POST /images Content-Type: application/json { "name": "sunset.jpg", "url": "data:image/jpeg;base64,/9j/4AAQ...", "size": 1024576, "type": "image/jpeg" }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method patch">PATCH</span>
+                        <span class="endpoint-path">/images/:id</span>
+                    </div>
+                    <div class="endpoint-desc">Update an existing image (rename)</div>
+                    <div class="endpoint-example">PATCH /images/123e4567-e89b-12d3-a456-426614174000 Content-Type: application/json { "name": "new-name.jpg" }
+                    </div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method delete">DELETE</span>
+                        <span class="endpoint-path">/images/:id</span>
+                    </div>
+                    <div class="endpoint-desc">Delete an image by ID</div>
+                    <div class="endpoint-example">DELETE /images/123e4567-e89b-12d3-a456-426614174000</div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/images/stats</span>
+                    </div>
+                    <div class="endpoint-desc">Get database statistics</div>
+                    <div class="endpoint-example">GET /images/stats</div>
+                </div>
+
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method get">GET</span>
+                        <span class="endpoint-path">/health</span>
+                    </div>
+                    <div class="endpoint-desc">Health check endpoint</div>
+                    <div class="endpoint-example">GET /health</div>
                 </div>
             </div>
         </div>
 
-        <div class="endpoint-section">
-            <div class="endpoint-card">
-                <div class="endpoint-icon">
-                    <i class="fas fa-images"></i>
-                </div>
-                <h3 class="endpoint-title">Images Endpoint</h3>
-                <p style="text-align: center; color: var(--gray); margin-bottom: 1.25rem;">
-                    Access and manage your image collection with full CRUD operations
-                </p>
-
-                <div class="code-block">
-                    <div><span class="method">GET</span> <span class="url">/api/images</span></div>
-                    <div style="margin-top: 0.5rem; color: var(--gray);">// Fetch all images</div>
-                </div>
-
-                <div class="code-block">
-                    <div><span class="method">GET</span> <span class="url">/api/images/:id</span></div>
-                    <div style="margin-top: 0.5rem; color: var(--gray);">// Get specific image</div>
-                </div>
-
-                <div class="code-block">
-                    <div><span class="method">POST</span> <span class="url">/api/images</span></div>
-                    <div style="margin-top: 0.5rem; color: var(--gray);">// Create new image</div>
-                </div>
-
-                <button class="try-button" onclick="testEndpoint()">
-                    <i class="fas fa-play" style="margin-right: 0.5rem;"></i>
-                    Test API Endpoint
-                </button>
-
-                <div id="response" class="response-display"></div>
-            </div>
+        <div class="footer">
+            <p>Images API v1.0.0 | Built with Express & LowDB</p>
         </div>
-
-        <div class="hero-card">
-            <h3 style="font-size: 1.25rem; margin-bottom: 1rem; text-align: center;">
-                <i class="fas fa-code" style="color: var(--accent); margin-right: 0.5rem;"></i> Quick Start Guide
-            </h3>
-            <div class="code-block">
-                <div style="color: var(--gray);">// JavaScript Fetch Example</div>
-                <div style="margin-top: 0.5rem;">
-                    <span style="color: var(--accent);">fetch</span>(<span style="color: var(--primary);">'https://images-json-server.vercel.app'</span>)
-                </div>
-                <div> .<span style="color: var(--accent);">then</span>(response => response.<span style="color: var(--accent);">json</span>())</div>
-                <div> .<span style="color: var(--accent);">then</span>(data => <span style="color: var(--accent);">console</span>.<span style="color: var(--accent);">log</span>(data));</div>
-            </div>
-
-            <div class="code-block">
-                <div style="color: var(--gray);">// cURL Example</div>
-                <div style="margin-top: 0.5rem;">
-                    <span style="color: var(--accent);">curl</span> -X GET <span style="color: var(--primary);">"https://images-json-server.vercel.app"</span>
-                </div>
-            </div>
-        </div>
-
-        <footer>
-            <div class="footer-links">
-
-                <a href="https://github.com/typicode/json-server" target="_blank">
-                    <i class="fab fa-github" style="margin-right: 0.5rem;"></i> GitHub
-                </a>
-                <a href="https://vercel.com" target="_blank">
-                    <i class="fas fa-cloud" style="margin-right: 0.5rem;"></i> Powered by Vercel
-                </a>
-            </div>
-            <p style="color: var(--gray); margin-top: 1rem;">
-                Built with ❤️ using JSON Server and modern web technologies
-            </p>
-        </footer>
     </div>
 
     <script>
-        async function testEndpoint() {
-            const responseDiv = document.getElementById('response');
-            const button = document.querySelector('.try-button');
+        const API_BASE = window.location.origin;
 
-            // Show loading state
-            button.innerHTML = '<i class="fas fa-spinner fa-spin" style="margin-right: 0.5rem;"></i>Testing...';
-            button.disabled = true;
+        async function checkHealth() {
+            const indicator = document.getElementById('health-indicator');
+            const status = document.getElementById('health-status');
+            const uptime = document.getElementById('uptime');
+            const lastCheck = document.getElementById('last-check');
 
-            // Show response area
-            responseDiv.style.display = 'block';
-            responseDiv.innerHTML = '<div style="color: var(--gray);">🔄 Making request to /api/images...</div>';
+            indicator.className = 'status-indicator loading';
+            status.textContent = 'Checking...';
 
             try {
-                // Try to fetch from relative path first
-                const response = await fetch('https://images-json-server.vercel.app/api/images');
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
 
                 if (response.ok) {
-                    const data = await response.json();
-                    responseDiv.innerHTML = `
-                        <div class="status-indicator status-success">✅ Success - ${response.status}</div>
-                        <div style="color: var(--gray); margin-bottom: 0.5rem;">Response:</div>
-                        <pre style="color: var(--white); white-space: pre-wrap;">${JSON.stringify(data, null, 2)}</pre>
-                    `;
+                    indicator.className = 'status-indicator';
+                    status.textContent = data.status;
+                    uptime.textContent = formatUptime(data.uptime);
                 } else {
-                    responseDiv.innerHTML = `
-                        <div class="status-indicator status-error">❌ Error - ${response.status}</div>
-                        <div style="color: #ef4444;">Status: ${response.statusText}</div>
-                    `;
+                    throw new Error('Health check failed');
                 }
             } catch (error) {
-                responseDiv.innerHTML = `
-                    <div class="status-indicator status-error">❌ Network Error</div>
-                    <div style="color: #ef4444; margin-bottom: 1rem;">Could not connect to the API endpoint.</div>
-                    <div style="color: var(--gray);">
-                        <strong>Possible reasons:</strong><br>
-                        • API server is not running<br>
-                        • Incorrect endpoint URL<br>
-                        • CORS configuration issues<br>
-                        • Network connectivity problems
-                    </div>
-                `;
-            } finally {
-                // Reset button
-                button.innerHTML = '<i class="fas fa-play" style="margin-right: 0.5rem;"></i>Test API Endpoint';
-                button.disabled = false;
+                indicator.className = 'status-indicator error';
+                status.textContent = 'Offline';
+                uptime.textContent = '-';
+            }
+
+            lastCheck.textContent = new Date().toLocaleTimeString();
+        }
+
+        async function getStats() {
+            const indicator = document.getElementById('db-indicator');
+            const totalImages = document.getElementById('total-images');
+            const totalSize = document.getElementById('total-size');
+            const imageTypes = document.getElementById('image-types');
+
+            indicator.className = 'status-indicator loading';
+            totalImages.textContent = 'Loading...';
+            totalSize.textContent = 'Loading...';
+            imageTypes.textContent = 'Loading...';
+
+            try {
+                const response = await fetch(`${API_BASE}/images/stats`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    indicator.className = 'status-indicator';
+                    totalImages.textContent = data.total.toLocaleString();
+                    totalSize.textContent = formatBytes(data.totalSize);
+                    imageTypes.textContent = data.types.length > 0 ? data.types.join(', ') : 'None';
+                } else {
+                    throw new Error('Stats fetch failed');
+                }
+            } catch (error) {
+                indicator.className = 'status-indicator error';
+                totalImages.textContent = 'Error';
+                totalSize.textContent = 'Error';
+                imageTypes.textContent = 'Error';
             }
         }
 
-        // Add smooth scrolling and interactive effects
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animate cards on scroll
-            const cards = document.querySelectorAll('.endpoint-card, .hero-card');
+        function formatUptime(seconds) {
+            const days = Math.floor(seconds / 86400);
+            const hours = Math.floor((seconds % 86400) / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = Math.floor(seconds % 60);
 
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }
-                });
-            }, {
-                threshold: 0.1
-            });
+            if (days > 0) return `${days}d ${hours}h ${minutes}m`;
+            if (hours > 0) return `${hours}h ${minutes}m ${secs}s`;
+            if (minutes > 0) return `${minutes}m ${secs}s`;
+            return `${secs}s`;
+        }
 
-            cards.forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(card);
-            });
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            checkHealth();
+            getStats();
+        }, 30000);
+
+        // Initial load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkHealth();
+            getStats();
         });
     </script>
 </body>
